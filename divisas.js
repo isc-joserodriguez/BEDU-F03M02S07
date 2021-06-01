@@ -17,29 +17,31 @@ app.get('/divisas', function (request, response) {
 });
 console.log(divisas)
 
-app.get('/divisas/:moneda', function (request, response) {
-    const { moneda } = request.params;
-    const valores = divisas.filter(divisa => divisa.moneda == moneda);
-    if (valores.length) {
-        response.status(200).json(valores[0].tipoCambio);
-    } else {
-        response.status(404).json({ error: 'No existe esa moneda' });
-    }
-});
-
-app.get('/divisas/:monedaA/:monedaB', function (request, response) {
-    const { monedaA, monedaB } = request.params;
-    const valores = divisas.filter(divisa => divisa.moneda == monedaA);
-
-    if (valores.length) {
-        const cambio = valores[0].tipoCambio.filter(divisa => divisa.moneda == monedaB);
-        if (cambio.length) {
-            response.status(200).json({ ok: `1 ${monedaA} vale ${cambio[0].valor}` });
+app.get('/divisas', function (request, response) {
+    const { moneda, monedaA, monedaB } = request.query;
+    let valores = [];
+    if (!!moneda) {
+        valores = divisas.filter(divisa => divisa.moneda == moneda);
+        if (valores.length) {
+            response.status(200).json(valores[0].tipoCambio);
         } else {
-            response.status(404).json({ error: `No existe el cambio de ${monedaA} a ${monedaB}` });
+            response.status(404).json({ error: 'No existe esa moneda' });
+        }
+    } else if (!!monedaA && !!monedaB) {
+        let valores = divisas.filter(divisa => divisa.moneda == monedaA);
+
+        if (valores.length) {
+            const cambio = valores[0].tipoCambio.filter(divisa => divisa.moneda == monedaB);
+            if (cambio.length) {
+                response.status(200).json({ ok: `1 ${monedaA} vale ${cambio[0].valor}` });
+            } else {
+                response.status(404).json({ error: `No existe el cambio de ${monedaA} a ${monedaB}` });
+            }
+        } else {
+            response.status(404).json({ error: `No existe el cambio de ${monedaA}` });
         }
     } else {
-        response.status(404).json({ error: `No existe el cambio de ${monedaA}` });
+        response.status(404).json({ error: 'Parámetros erroneos' });
     }
 });
 

@@ -1,9 +1,9 @@
-const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-let connection;
-
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+const mysql = require('mysql2/promise');
+
+let connection;
 
 const connect = async () => {
     try {
@@ -15,19 +15,17 @@ const connect = async () => {
         });
         console.log('> Conectado a la base de datos');
     } catch (e) {
-        console.log('> Error al conectarme a la BD');
+        console.error('> No se puede establecer la conexión a la BD');
         process.exit(1);
     }
 }
 
-const executeQuery = async () => {
-    const [rows] = await connection.execute('SELECT * FROM prueba_tabla');
-    console.log(rows);
+const execute = async (query) => {
+    const [rows] = await connection.execute(query);
+    return rows;
 }
 
-const main = async () => {
-    await connect();
-    await executeQuery();
+module.exports = {
+    connect,
+    execute
 }
-
-main();

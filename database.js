@@ -20,8 +20,8 @@ const connect = async () => {
     }
 }
 
-const execute = async (query) => {
-    const [rows] = await connection.execute(query);
+const execute = async (query, params) => {
+    const [rows] = await connection.execute(query, params);
     return rows;
 }
 
